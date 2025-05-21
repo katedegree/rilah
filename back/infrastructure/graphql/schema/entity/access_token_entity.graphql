@@ -1,0 +1,9 @@
+type AccessTokenEntity {
+  id: Uint32!
+  user_id: Uint32!
+  token: String!
+  expires_at: Time!
+  created_at: Time!
+  updated_at: Time!
+  deleted_at: Time!
+}

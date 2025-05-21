@@ -1,0 +1,8 @@
+type PointEntity {
+  userId: Uint32!
+  groupId: Uint32!
+  amount: Int32!
+  createdAt: Time!
+  updatedAt: Time!
+  deletedAt: Time
+}

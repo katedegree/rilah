@@ -1,0 +1,3 @@
+extend type Mutation {
+  joinUser(groupId: Uint32!, userId: Uint32!): MutationResponse! @auth
+}

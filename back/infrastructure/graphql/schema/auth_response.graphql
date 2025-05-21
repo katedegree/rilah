@@ -1,0 +1,5 @@
+type AuthResponse {
+    accessToken: String!
+    success: Boolean!
+    messages: [String!]!
+}

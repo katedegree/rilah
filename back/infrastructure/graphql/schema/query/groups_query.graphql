@@ -1,0 +1,3 @@
+extend type Query {
+  groups: [GroupEntity!]! @auth
+}

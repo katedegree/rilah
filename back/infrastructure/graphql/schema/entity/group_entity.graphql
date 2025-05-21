@@ -1,0 +1,7 @@
+type GroupEntity {
+  id: Uint32!
+  name: String!
+  createdAt: Time!
+  updatedAt: Time!
+  deletedAt: Time!
+}

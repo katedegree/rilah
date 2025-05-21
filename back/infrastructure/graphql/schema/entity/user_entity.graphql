@@ -1,0 +1,9 @@
+type UserEntity {
+  id: Uint32!
+  name: String!
+  accountCode: String!
+  password: String!
+  createdAt: String!
+  updatedAt: String!
+  deletedAt: String!
+}

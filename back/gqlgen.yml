@@ -1,0 +1,40 @@
+schema:
+  - infrastructure/graphql/schema/**/*.graphql
+
+exec:
+  package: graphql
+  filename: infrastructure/graphql/generated.go
+
+model:
+  package: entity
+  filename: domain/entity/entities_gen.go
+
+resolver:
+  layout: follow-schema
+  dir: infrastructure/graphql/resolver
+  filename_template: "{name}_resolver.go"
+
+call_argument_directives_with_null: true
+
+autobind:
+
+models:
+  ID:
+    model:
+      - github.com/99designs/gqlgen/graphql.ID
+      - github.com/99designs/gqlgen/graphql.Int
+      - github.com/99designs/gqlgen/graphql.Int64
+      - github.com/99designs/gqlgen/graphql.Int32
+  UUID:
+    model:
+      - github.com/99designs/gqlgen/graphql.UUID
+  Int32:
+    model:
+      - github.com/99designs/gqlgen/graphql.Int32
+  Int64:
+    model:
+      - github.com/99designs/gqlgen/graphql.Int
+      - github.com/99designs/gqlgen/graphql.Int64
+  Uint32:
+    model:
+      - github.com/99designs/gqlgen/graphql.Uint32

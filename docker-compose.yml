@@ -1,0 +1,17 @@
+services:
+  api:
+    build: ./back/
+    volumes:
+      - ./back:/back
+    ports:
+     - 8080:8080
+  db:
+    image: postgres:17
+    volumes:
+      - ./back/postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: kate_degree
+      POSTGRES_PASSWORD: keito0418
+      POSTGRES_DB: dev

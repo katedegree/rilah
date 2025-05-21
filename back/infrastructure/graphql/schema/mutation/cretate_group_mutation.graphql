@@ -1,0 +1,3 @@
+extend type Mutation {  
+  createGroup(name: String!): MutationResponse! @auth
+}

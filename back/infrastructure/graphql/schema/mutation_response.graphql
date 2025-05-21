@@ -1,0 +1,4 @@
+type MutationResponse {
+    success: Boolean!
+    messages: [String!]!
+}
