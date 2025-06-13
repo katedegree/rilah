@@ -31,7 +31,9 @@ func main() {
 	}
 
 	srv := handler.New(graphql.NewExecutableSchema(graphql.Config{
-		Resolvers: &resolver.Resolver{Orm: infrastructure.Gorm()},
+		Resolvers: &resolver.Resolver{
+			Orm: infrastructure.Gorm(),
+		},
 		Directives: graphql.DirectiveRoot{
 			Auth: directive.AuthDirective,
 		},

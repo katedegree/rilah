@@ -4,6 +4,7 @@ go 1.24.3
 
 require (
 	github.com/99designs/gqlgen v0.17.73
+	github.com/go-playground/validator/v10 v10.26.0
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
@@ -15,6 +16,9 @@ require (
 
 require (
 	github.com/agnivade/levenshtein v1.2.1 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
+	github.com/go-playground/locales v0.14.1 // indirect
+	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
@@ -24,7 +28,10 @@ require (
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/sosodev/duration v1.3.1 // indirect
+	golang.org/x/net v0.39.0 // indirect
 	golang.org/x/sync v0.14.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.25.0 // indirect
 )
