@@ -19,7 +19,7 @@ func NewGetUserGroupsUsecase(
 }
 
 func (u *getUserGroupsUsecase) Execute(userID uint32) ([]*entity.GroupEntity, *internal.UsecaseError) {
-	groups, err := u.groupRepository.FindByUserID(userID)
+	groups, err := u.groupRepository.ListByUserID(userID)
 	if err != nil {
 		return nil, &internal.UsecaseError{
 			Code:    500,

@@ -97,7 +97,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Groups func(childComplexity int) int
+		GroupUsers func(childComplexity int, groupID uint32) int
+		Groups     func(childComplexity int) int
 	}
 
 	UserEntity struct {
@@ -120,6 +121,7 @@ type MutationResolver interface {
 	UpdateGroup(ctx context.Context, groupID uint32, name string) (*entity.MutationResponse, error)
 }
 type QueryResolver interface {
+	GroupUsers(ctx context.Context, groupID uint32) ([]*entity.UserEntity, error)
 	Groups(ctx context.Context) ([]*entity.GroupEntity, error)
 }
 
@@ -375,6 +377,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.PointEntity.UserID(childComplexity), true
 
+	case "Query.groupUsers":
+		if e.complexity.Query.GroupUsers == nil {
+			break
+		}
+
+		args, err := ec.field_Query_groupUsers_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GroupUsers(childComplexity, args["groupId"].(uint32)), true
+
 	case "Query.groups":
 		if e.complexity.Query.Groups == nil {
 			break
@@ -534,7 +548,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "schema/auth.graphql" "schema/auth_response.graphql" "schema/entity/access_token_entity.graphql" "schema/entity/group_entity.graphql" "schema/entity/point_entity.graphql" "schema/entity/user_entity.graphql" "schema/mutation/cretate_group_mutation.graphql" "schema/mutation/delete_user_mutation.graphql" "schema/mutation/join_user_mutaion.graphql" "schema/mutation/login_mutation.graphql" "schema/mutation/sign_up_mutation.graphql" "schema/mutation/update_group_mutation.graphql" "schema/mutation.graphql" "schema/mutation_response.graphql" "schema/query/groups_query.graphql" "schema/query.graphql" "schema/scalar/int32.graphql" "schema/scalar/time.graphql" "schema/scalar/uint32.graphql"
+//go:embed "schema/auth.graphql" "schema/auth_response.graphql" "schema/entity/access_token_entity.graphql" "schema/entity/group_entity.graphql" "schema/entity/point_entity.graphql" "schema/entity/user_entity.graphql" "schema/mutation/cretate_group_mutation.graphql" "schema/mutation/delete_user_mutation.graphql" "schema/mutation/join_user_mutaion.graphql" "schema/mutation/login_mutation.graphql" "schema/mutation/sign_up_mutation.graphql" "schema/mutation/update_group_mutation.graphql" "schema/mutation.graphql" "schema/mutation_response.graphql" "schema/query/group_users_query.graphql" "schema/query/groups_query.graphql" "schema/query.graphql" "schema/scalar/int32.graphql" "schema/scalar/time.graphql" "schema/scalar/uint32.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -560,6 +574,7 @@ var sources = []*ast.Source{
 	{Name: "schema/mutation/update_group_mutation.graphql", Input: sourceData("schema/mutation/update_group_mutation.graphql"), BuiltIn: false},
 	{Name: "schema/mutation.graphql", Input: sourceData("schema/mutation.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_response.graphql", Input: sourceData("schema/mutation_response.graphql"), BuiltIn: false},
+	{Name: "schema/query/group_users_query.graphql", Input: sourceData("schema/query/group_users_query.graphql"), BuiltIn: false},
 	{Name: "schema/query/groups_query.graphql", Input: sourceData("schema/query/groups_query.graphql"), BuiltIn: false},
 	{Name: "schema/query.graphql", Input: sourceData("schema/query.graphql"), BuiltIn: false},
 	{Name: "schema/scalar/int32.graphql", Input: sourceData("schema/scalar/int32.graphql"), BuiltIn: false},
@@ -820,6 +835,29 @@ func (ec *executionContext) field_Query___type_argsName(
 	}
 
 	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_groupUsers_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_groupUsers_argsGroupID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["groupId"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_groupUsers_argsGroupID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (uint32, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("groupId"))
+	if tmp, ok := rawArgs["groupId"]; ok {
+		return ec.unmarshalNUint322uint32(ctx, tmp)
+	}
+
+	var zeroVal uint32
 	return zeroVal, nil
 }
 
@@ -2386,6 +2424,99 @@ func (ec *executionContext) fieldContext_PointEntity_deletedAt(_ context.Context
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Time does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_groupUsers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_groupUsers(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		directive0 := func(rctx context.Context) (any, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().GroupUsers(rctx, fc.Args["groupId"].(uint32))
+		}
+
+		directive1 := func(ctx context.Context) (any, error) {
+			if ec.directives.Auth == nil {
+				var zeroVal []*entity.UserEntity
+				return zeroVal, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*entity.UserEntity); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*back/domain/entity.UserEntity`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*entity.UserEntity)
+	fc.Result = res
+	return ec.marshalNUserEntity2ᚕᚖbackᚋdomainᚋentityᚐUserEntityᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_groupUsers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_UserEntity_id(ctx, field)
+			case "name":
+				return ec.fieldContext_UserEntity_name(ctx, field)
+			case "accountCode":
+				return ec.fieldContext_UserEntity_accountCode(ctx, field)
+			case "password":
+				return ec.fieldContext_UserEntity_password(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_UserEntity_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_UserEntity_updatedAt(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_UserEntity_deletedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserEntity", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_groupUsers_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -5251,6 +5382,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "groupUsers":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_groupUsers(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "groups":
 			field := field
 
@@ -5898,6 +6051,60 @@ func (ec *executionContext) marshalNUint322uint32(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNUserEntity2ᚕᚖbackᚋdomainᚋentityᚐUserEntityᚄ(ctx context.Context, sel ast.SelectionSet, v []*entity.UserEntity) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNUserEntity2ᚖbackᚋdomainᚋentityᚐUserEntity(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNUserEntity2ᚖbackᚋdomainᚋentityᚐUserEntity(ctx context.Context, sel ast.SelectionSet, v *entity.UserEntity) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UserEntity(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

@@ -42,7 +42,7 @@ func (r *groupRepository) Create(ge *entity.GroupEntity, authID uint32) (*entity
 	}, nil
 }
 
-func (r *groupRepository) FindByUserID(userID uint32) ([]*entity.GroupEntity, error) {
+func (r *groupRepository) ListByUserID(userID uint32) ([]*entity.GroupEntity, error) {
 	var user model.UserModel
 
 	if err := r.orm.Preload("Groups").First(&user, userID).Error; err != nil {

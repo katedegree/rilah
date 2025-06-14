@@ -17,4 +17,6 @@ type GroupModel struct {
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 
 	Name string `gorm:"size:255;not null" json:"name"`
+
+	Users []UserModel `gorm:"many2many:group_users;foreignKey:ID;joinForeignKey:group_id;joinReferences:user_id" json:"users"`
 }

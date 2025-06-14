@@ -73,8 +73,40 @@ func (r *userRepository) FindByToken(token string) (*entity.UserEntity, error) {
 
 	userEntity := &entity.UserEntity{
 		ID:          tokenModel.User.ID,
+		Name:        tokenModel.User.Name,
 		AccountCode: tokenModel.User.AccountCode,
 	}
 
 	return userEntity, nil
+}
+
+func (r *userRepository) ListByGroupID(authID, groupID uint32) ([]*entity.UserEntity, error) {
+	var user model.UserModel
+	result := r.orm.Preload("Groups", "id = ?", groupID).First(&user, authID)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to find user by ID: %w", result.Error)
+	}
+	if len(user.Groups) == 0 {
+		return nil, fmt.Errorf("user does not belong to the group")
+	}
+
+	var group model.GroupModel
+	result = r.orm.Preload("Users").First(&group, groupID)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to find group by ID: %w", result.Error)
+	}
+
+	userEntities := make([]*entity.UserEntity, len(group.Users))
+	for i, userModel := range group.Users {
+		userEntities[i] = &entity.UserEntity{
+			ID:          userModel.ID,
+			Name:        userModel.Name,
+			AccountCode: userModel.AccountCode,
+		}
+	}
+
+	return userEntities, nil
 }
