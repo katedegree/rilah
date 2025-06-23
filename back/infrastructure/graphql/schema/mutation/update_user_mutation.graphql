@@ -1,0 +1,8 @@
+extend type Mutation {
+  updateUser(
+    name: String
+    accountCode: String
+    password: String
+    imageFile: Upload
+  ): MutationResponse! @auth
+}

@@ -26,7 +26,7 @@ type signUpUsecaseResponse struct {
 func (u *signUpUsecase) Execute(ue entity.UserEntity) (*signUpUsecaseResponse, *internal.UsecaseError) {
 	authService := service.NewAuthService()
 
-	if authService.IsAccountCodeDuplicate(ue.AccountCode, u.userRepository) {
+	if authService.IsAccountCodeDuplicate(ue.AccountCode, nil, u.userRepository) {
 		return nil, &internal.UsecaseError{
 			Code:    400,
 			Message: "既に登録されているアカウントコードです。",

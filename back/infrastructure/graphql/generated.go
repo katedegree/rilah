@@ -80,6 +80,7 @@ type ComplexityRoot struct {
 		Login       func(childComplexity int, accountCode string, password string) int
 		SignUp      func(childComplexity int, name string, accountCode string, password string) int
 		UpdateGroup func(childComplexity int, groupID uint32, name string) int
+		UpdateUser  func(childComplexity int, name *string, accountCode *string, password *string, imageFile *graphql.Upload) int
 	}
 
 	MutationResponse struct {
@@ -106,6 +107,7 @@ type ComplexityRoot struct {
 		CreatedAt   func(childComplexity int) int
 		DeletedAt   func(childComplexity int) int
 		ID          func(childComplexity int) int
+		ImageURL    func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Password    func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
@@ -119,6 +121,7 @@ type MutationResolver interface {
 	Login(ctx context.Context, accountCode string, password string) (*entity.AuthResponse, error)
 	SignUp(ctx context.Context, name string, accountCode string, password string) (*entity.AuthResponse, error)
 	UpdateGroup(ctx context.Context, groupID uint32, name string) (*entity.MutationResponse, error)
+	UpdateUser(ctx context.Context, name *string, accountCode *string, password *string, imageFile *graphql.Upload) (*entity.MutationResponse, error)
 }
 type QueryResolver interface {
 	GroupUsers(ctx context.Context, groupID uint32) ([]*entity.UserEntity, error)
@@ -321,6 +324,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.UpdateGroup(childComplexity, args["groupId"].(uint32), args["name"].(string)), true
 
+	case "Mutation.updateUser":
+		if e.complexity.Mutation.UpdateUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateUser_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateUser(childComplexity, args["name"].(*string), args["accountCode"].(*string), args["password"].(*string), args["imageFile"].(*graphql.Upload)), true
+
 	case "MutationResponse.messages":
 		if e.complexity.MutationResponse.Messages == nil {
 			break
@@ -423,6 +438,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.UserEntity.ID(childComplexity), true
+
+	case "UserEntity.imageUrl":
+		if e.complexity.UserEntity.ImageURL == nil {
+			break
+		}
+
+		return e.complexity.UserEntity.ImageURL(childComplexity), true
 
 	case "UserEntity.name":
 		if e.complexity.UserEntity.Name == nil {
@@ -548,7 +570,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "schema/auth.graphql" "schema/auth_response.graphql" "schema/entity/access_token_entity.graphql" "schema/entity/group_entity.graphql" "schema/entity/point_entity.graphql" "schema/entity/user_entity.graphql" "schema/mutation/cretate_group_mutation.graphql" "schema/mutation/delete_user_mutation.graphql" "schema/mutation/join_user_mutaion.graphql" "schema/mutation/login_mutation.graphql" "schema/mutation/sign_up_mutation.graphql" "schema/mutation/update_group_mutation.graphql" "schema/mutation.graphql" "schema/mutation_response.graphql" "schema/query/group_users_query.graphql" "schema/query/groups_query.graphql" "schema/query.graphql" "schema/scalar/int32.graphql" "schema/scalar/time.graphql" "schema/scalar/uint32.graphql"
+//go:embed "schema/auth.graphql" "schema/auth_response.graphql" "schema/entity/access_token_entity.graphql" "schema/entity/group_entity.graphql" "schema/entity/point_entity.graphql" "schema/entity/user_entity.graphql" "schema/mutation/cretate_group_mutation.graphql" "schema/mutation/delete_user_mutation.graphql" "schema/mutation/join_user_mutaion.graphql" "schema/mutation/login_mutation.graphql" "schema/mutation/sign_up_mutation.graphql" "schema/mutation/update_group_mutation.graphql" "schema/mutation/update_user_mutation.graphql" "schema/mutation.graphql" "schema/mutation_response.graphql" "schema/query/group_users_query.graphql" "schema/query/groups_query.graphql" "schema/query.graphql" "schema/scalar/int32.graphql" "schema/scalar/time.graphql" "schema/scalar/uint32.graphql" "schema/scalar/upload.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -572,6 +594,7 @@ var sources = []*ast.Source{
 	{Name: "schema/mutation/login_mutation.graphql", Input: sourceData("schema/mutation/login_mutation.graphql"), BuiltIn: false},
 	{Name: "schema/mutation/sign_up_mutation.graphql", Input: sourceData("schema/mutation/sign_up_mutation.graphql"), BuiltIn: false},
 	{Name: "schema/mutation/update_group_mutation.graphql", Input: sourceData("schema/mutation/update_group_mutation.graphql"), BuiltIn: false},
+	{Name: "schema/mutation/update_user_mutation.graphql", Input: sourceData("schema/mutation/update_user_mutation.graphql"), BuiltIn: false},
 	{Name: "schema/mutation.graphql", Input: sourceData("schema/mutation.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_response.graphql", Input: sourceData("schema/mutation_response.graphql"), BuiltIn: false},
 	{Name: "schema/query/group_users_query.graphql", Input: sourceData("schema/query/group_users_query.graphql"), BuiltIn: false},
@@ -580,6 +603,7 @@ var sources = []*ast.Source{
 	{Name: "schema/scalar/int32.graphql", Input: sourceData("schema/scalar/int32.graphql"), BuiltIn: false},
 	{Name: "schema/scalar/time.graphql", Input: sourceData("schema/scalar/time.graphql"), BuiltIn: false},
 	{Name: "schema/scalar/uint32.graphql", Input: sourceData("schema/scalar/uint32.graphql"), BuiltIn: false},
+	{Name: "schema/scalar/upload.graphql", Input: sourceData("schema/scalar/upload.graphql"), BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -812,6 +836,83 @@ func (ec *executionContext) field_Mutation_updateGroup_argsName(
 	}
 
 	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updateUser_argsName(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["name"] = arg0
+	arg1, err := ec.field_Mutation_updateUser_argsAccountCode(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["accountCode"] = arg1
+	arg2, err := ec.field_Mutation_updateUser_argsPassword(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["password"] = arg2
+	arg3, err := ec.field_Mutation_updateUser_argsImageFile(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["imageFile"] = arg3
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateUser_argsName(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+	if tmp, ok := rawArgs["name"]; ok {
+		return ec.unmarshalOString2ᚖstring(ctx, tmp)
+	}
+
+	var zeroVal *string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateUser_argsAccountCode(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("accountCode"))
+	if tmp, ok := rawArgs["accountCode"]; ok {
+		return ec.unmarshalOString2ᚖstring(ctx, tmp)
+	}
+
+	var zeroVal *string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateUser_argsPassword(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+	if tmp, ok := rawArgs["password"]; ok {
+		return ec.unmarshalOString2ᚖstring(ctx, tmp)
+	}
+
+	var zeroVal *string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateUser_argsImageFile(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*graphql.Upload, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("imageFile"))
+	if tmp, ok := rawArgs["imageFile"]; ok {
+		return ec.unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, tmp)
+	}
+
+	var zeroVal *graphql.Upload
 	return zeroVal, nil
 }
 
@@ -2079,6 +2180,89 @@ func (ec *executionContext) fieldContext_Mutation_updateGroup(ctx context.Contex
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateUser(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		directive0 := func(rctx context.Context) (any, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateUser(rctx, fc.Args["name"].(*string), fc.Args["accountCode"].(*string), fc.Args["password"].(*string), fc.Args["imageFile"].(*graphql.Upload))
+		}
+
+		directive1 := func(ctx context.Context) (any, error) {
+			if ec.directives.Auth == nil {
+				var zeroVal *entity.MutationResponse
+				return zeroVal, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*entity.MutationResponse); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *back/domain/entity.MutationResponse`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*entity.MutationResponse)
+	fc.Result = res
+	return ec.marshalNMutationResponse2ᚖbackᚋdomainᚋentityᚐMutationResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "success":
+				return ec.fieldContext_MutationResponse_success(ctx, field)
+			case "messages":
+				return ec.fieldContext_MutationResponse_messages(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MutationResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _MutationResponse_success(ctx context.Context, field graphql.CollectedField, obj *entity.MutationResponse) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MutationResponse_success(ctx, field)
 	if err != nil {
@@ -2497,6 +2681,8 @@ func (ec *executionContext) fieldContext_Query_groupUsers(ctx context.Context, f
 				return ec.fieldContext_UserEntity_accountCode(ctx, field)
 			case "password":
 				return ec.fieldContext_UserEntity_password(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_UserEntity_imageUrl(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_UserEntity_createdAt(ctx, field)
 			case "updatedAt":
@@ -2894,6 +3080,50 @@ func (ec *executionContext) _UserEntity_password(ctx context.Context, field grap
 }
 
 func (ec *executionContext) fieldContext_UserEntity_password(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserEntity",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserEntity_imageUrl(ctx context.Context, field graphql.CollectedField, obj *entity.UserEntity) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserEntity_imageUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImageURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserEntity_imageUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "UserEntity",
 		Field:      field,
@@ -5235,6 +5465,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "updateUser":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateUser(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5485,6 +5722,11 @@ func (ec *executionContext) _UserEntity(ctx context.Context, sel ast.SelectionSe
 			}
 		case "password":
 			out.Values[i] = ec._UserEntity_password(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "imageUrl":
+			out.Values[i] = ec._UserEntity_imageUrl(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -6423,6 +6665,24 @@ func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel
 	_ = sel
 	_ = ctx
 	res := graphql.MarshalTime(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v any) (*graphql.Upload, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalUpload(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, sel ast.SelectionSet, v *graphql.Upload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	_ = sel
+	_ = ctx
+	res := graphql.MarshalUpload(*v)
 	return res
 }
 

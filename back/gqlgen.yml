@@ -38,3 +38,6 @@ models:
   Uint32:
     model:
       - github.com/99designs/gqlgen/graphql.Uint32
+  Upload:
+    model:
+      - github.com/99designs/gqlgen/graphql.Upload

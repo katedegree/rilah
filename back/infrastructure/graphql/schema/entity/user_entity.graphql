@@ -3,6 +3,7 @@ type UserEntity {
   name: String!
   accountCode: String!
   password: String!
+  imageUrl: String!
   createdAt: String!
   updatedAt: String!
   deletedAt: String!

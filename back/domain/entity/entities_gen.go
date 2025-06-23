@@ -55,6 +55,7 @@ type UserEntity struct {
 	Name        string `json:"name"`
 	AccountCode string `json:"accountCode"`
 	Password    string `json:"password"`
+	ImageURL    string `json:"imageUrl"`
 	CreatedAt   string `json:"createdAt"`
 	UpdatedAt   string `json:"updatedAt"`
 	DeletedAt   string `json:"deletedAt"`

@@ -42,10 +42,15 @@ func (s *authService) IsValidAccountCode(code string) bool {
 }
 
 // アカウントコードの重複検証
-func (s *authService) IsAccountCodeDuplicate(accountCode string, userRepository repository.UserRepository) bool {
+func (s *authService) IsAccountCodeDuplicate(accountCode string, oldAccountCode *string, userRepository repository.UserRepository) bool {
+	if oldAccountCode == nil || accountCode == *oldAccountCode {
+		return false
+	}
+
 	user, err := userRepository.FindByAccountCode(accountCode)
 	if err != nil {
 		return false
 	}
+
 	return user != nil
 }

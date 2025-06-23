@@ -32,7 +32,8 @@ func main() {
 
 	srv := handler.New(graphql.NewExecutableSchema(graphql.Config{
 		Resolvers: &resolver.Resolver{
-			Orm: infrastructure.Gorm(),
+			Orm:     infrastructure.Gorm(),
+			Storage: infrastructure.S3(),
 		},
 		Directives: graphql.DirectiveRoot{
 			Auth: directive.AuthDirective,
@@ -42,6 +43,7 @@ func main() {
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
 	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.MultipartForm{})
 
 	srv.SetQueryCache(lru.New[*ast.QueryDocument](1000))
 
