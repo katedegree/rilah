@@ -27,7 +27,7 @@ func (u *updateUserUsecase) Execute(
 	password *string,
 	file io.ReadSeeker,
 	contentType *string,
-) (*entity.UserEntity, *internal.UsecaseError) {
+) *internal.UsecaseError {
 	userEntity := &entity.UserEntity{
 		ID: authUser.ID,
 	}
@@ -38,12 +38,12 @@ func (u *updateUserUsecase) Execute(
 	if accountCode != nil {
 		authService := service.NewAuthService()
 		if authService.IsAccountCodeDuplicate(*accountCode, &authUser.AccountCode, u.userRepository) {
-			return nil, &internal.UsecaseError{
+			return &internal.UsecaseError{
 				Message: "アカウントコードが重複しています",
 			}
 		}
 		if !authService.IsValidAccountCode(*accountCode) {
-			return nil, &internal.UsecaseError{
+			return &internal.UsecaseError{
 				Message: "アカウントコードの形式が正しくありません",
 			}
 		}
@@ -55,19 +55,19 @@ func (u *updateUserUsecase) Execute(
 	if file != nil && contentType != nil {
 		url, err := u.fileRepository.Upload(file, *contentType)
 		if err != nil {
-			return nil, &internal.UsecaseError{
+			return &internal.UsecaseError{
 				Message: "画像ファイルのアップロードに失敗しました",
 			}
 		}
 		userEntity.ImageURL = url
 	}
 
-	updatedUserEntity, err := u.userRepository.Update(userEntity)
+	err := u.userRepository.Update(userEntity)
 	if err != nil {
-		return nil, &internal.UsecaseError{
+		return &internal.UsecaseError{
 			Message: "ユーザー情報の更新に失敗しました",
 		}
 	}
 
-	return updatedUserEntity, nil
+	return nil
 }

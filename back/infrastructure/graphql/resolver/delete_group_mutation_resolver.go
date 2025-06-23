@@ -32,7 +32,7 @@ func (r *mutationResolver) DeleteGroup(ctx context.Context, groupID uint32) (*en
 	deleteGroupUsecase := usecase.NewDeleteGroupUsecase(
 		repository.NewGroupRepository(orm),
 	)
-	_, err := deleteGroupUsecase.Execute(groupID, authUser.ID)
+	err := deleteGroupUsecase.Execute(groupID, authUser.ID)
 	if err != nil {
 		return &entity.MutationResponse{
 			Success:  false,

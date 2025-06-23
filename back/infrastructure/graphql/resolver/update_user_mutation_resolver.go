@@ -61,7 +61,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, name *string, account
 		contentType = &imageFile.ContentType
 	}
 
-	_, err := updateUserUsecase.Execute(
+	err := updateUserUsecase.Execute(
 		authUser,
 		name,
 		accountCode,

@@ -37,7 +37,7 @@ func (r *mutationResolver) UpdateGroup(ctx context.Context, groupID uint32, name
 		ID:   groupID,
 		Name: name,
 	}
-	_, err := updateGroupUsecase.Execute(ge, authUser.ID)
+	err := updateGroupUsecase.Execute(ge, authUser.ID)
 	if err != nil {
 		return &entity.MutationResponse{
 			Success:  false,

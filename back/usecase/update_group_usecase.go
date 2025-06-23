@@ -14,13 +14,13 @@ func NewUpdateGroupUsecase(groupRepository repository.GroupRepository) *updateGr
 	return &updateGroupUsecase{groupRepository: groupRepository}
 }
 
-func (u *updateGroupUsecase) Execute(ge *entity.GroupEntity, userID uint32) (*entity.GroupEntity, *internal.UsecaseError) {
-	group, err := u.groupRepository.Update(ge, userID)
+func (u *updateGroupUsecase) Execute(ge *entity.GroupEntity, userID uint32) *internal.UsecaseError {
+	err := u.groupRepository.Update(ge, userID)
 	if err != nil {
-		return nil, &internal.UsecaseError{
+		return &internal.UsecaseError{
 			Message: "グループの更新に失敗しました",
 		}
 	}
 
-	return group, nil
+	return nil
 }

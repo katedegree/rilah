@@ -60,7 +60,7 @@ func (r *userRepository) Create(user *entity.UserEntity) (*entity.UserEntity, er
 	}, nil
 }
 
-func (r *userRepository) Update(user *entity.UserEntity) (*entity.UserEntity, error) {
+func (r *userRepository) Update(user *entity.UserEntity) error {
 	updateData := map[string]interface{}{}
 
 	if user.Name != "" {
@@ -72,7 +72,7 @@ func (r *userRepository) Update(user *entity.UserEntity) (*entity.UserEntity, er
 	if user.Password != "" {
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 		if err != nil {
-			return nil, fmt.Errorf("failed to hash password: %w", err)
+			return fmt.Errorf("failed to hash password: %w", err)
 		}
 		updateData["password"] = string(hashedPassword)
 	}
@@ -81,22 +81,10 @@ func (r *userRepository) Update(user *entity.UserEntity) (*entity.UserEntity, er
 	}
 
 	if err := r.orm.Model(&model.UserModel{}).Where("id = ?", user.ID).Updates(updateData).Error; err != nil {
-		return nil, err
+		return err
 	}
 
-	var um model.UserModel
-	if err := r.orm.First(&um, user.ID).Error; err != nil {
-		return nil, err
-	}
-
-	ue := &entity.UserEntity{
-		ID:          um.ID,
-		Name:        um.Name,
-		AccountCode: um.AccountCode,
-		Password:    um.Password,
-		ImageURL:    um.ImageURL,
-	}
-	return ue, nil
+	return nil
 }
 
 func (r *userRepository) FindByToken(token string) (*entity.UserEntity, error) {

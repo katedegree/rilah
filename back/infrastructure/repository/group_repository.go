@@ -62,10 +62,10 @@ func (r *groupRepository) ListByUserID(userID uint32) ([]*entity.GroupEntity, er
 	return groupEntities, nil
 }
 
-func (r *groupRepository) Update(ge *entity.GroupEntity, authID uint32) (*entity.GroupEntity, error) {
+func (r *groupRepository) Update(ge *entity.GroupEntity, authID uint32) error {
 	var user model.UserModel
 	if err := r.orm.Preload("Groups").First(&user, authID).Error; err != nil {
-		return nil, err
+		return err
 	}
 
 	var groupModel *model.GroupModel
@@ -77,26 +77,21 @@ func (r *groupRepository) Update(ge *entity.GroupEntity, authID uint32) (*entity
 	}
 
 	if groupModel == nil {
-		return nil, gorm.ErrRecordNotFound
+		return gorm.ErrRecordNotFound
 	}
 
 	groupModel.Name = ge.Name
 	if err := r.orm.Save(groupModel).Error; err != nil {
-		return nil, err
+		return err
 	}
 
-	return &entity.GroupEntity{
-		ID:        groupModel.ID,
-		Name:      groupModel.Name,
-		CreatedAt: groupModel.CreatedAt,
-		UpdatedAt: groupModel.UpdatedAt,
-	}, nil
+	return nil
 }
 
-func (r *groupRepository) Delete(groupID, authID uint32) (*entity.GroupEntity, error) {
+func (r *groupRepository) Delete(groupID, authID uint32) error {
 	var user model.UserModel
 	if err := r.orm.Preload("Groups").First(&user, authID).Error; err != nil {
-		return nil, err
+		return err
 	}
 
 	var groupToDelete *model.GroupModel
@@ -108,21 +103,14 @@ func (r *groupRepository) Delete(groupID, authID uint32) (*entity.GroupEntity, e
 	}
 
 	if groupToDelete == nil {
-		return nil, gorm.ErrRecordNotFound
-	}
-
-	deletedEntity := &entity.GroupEntity{
-		ID:        groupToDelete.ID,
-		Name:      groupToDelete.Name,
-		CreatedAt: groupToDelete.CreatedAt,
-		UpdatedAt: groupToDelete.UpdatedAt,
+		return gorm.ErrRecordNotFound
 	}
 
 	if err := r.orm.Delete(&model.GroupModel{}, groupID).Error; err != nil {
-		return nil, err
+		return err
 	}
 
-	return deletedEntity, nil
+	return nil
 }
 
 func (r *groupRepository) LinkUser(groupID, userID, authID uint32) (*entity.GroupEntity, error) {

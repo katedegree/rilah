@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"back/domain/entity"
 	"back/domain/repository"
 	"back/usecase/internal"
 )
@@ -14,13 +13,13 @@ func NewDeleteGroupUsecase(groupRepository repository.GroupRepository) *deleteGr
 	return &deleteGroupUsecase{groupRepository: groupRepository}
 }
 
-func (u *deleteGroupUsecase) Execute(groupID, userID uint32) (*entity.GroupEntity, *internal.UsecaseError) {
-	group, err := u.groupRepository.Delete(groupID, userID)
+func (u *deleteGroupUsecase) Execute(groupID, userID uint32) *internal.UsecaseError {
+	err := u.groupRepository.Delete(groupID, userID)
 	if err != nil {
-		return nil, &internal.UsecaseError{
+		return &internal.UsecaseError{
 			Message: "グループの削除に失敗しました",
 		}
 	}
 
-	return group, nil
+	return nil
 }
