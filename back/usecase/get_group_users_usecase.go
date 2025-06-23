@@ -22,7 +22,6 @@ func (u *getGroupUsersUsecase) Execute(authID, groupID uint32) ([]*entity.UserEn
 	users, err := u.userRepository.ListByGroupID(authID, groupID)
 	if err != nil {
 		return nil, &internal.UsecaseError{
-			Code:    500,
 			Message: "ユーザーの取得に失敗しました",
 		}
 	}

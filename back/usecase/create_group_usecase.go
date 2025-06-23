@@ -45,7 +45,6 @@ func (u *createGroupUsecase) Execute(ge entity.GroupEntity, userID uint32) (*ent
 
 	if err != nil {
 		return nil, &internal.UsecaseError{
-			Code:    400,
 			Message: "グループの登録に失敗しました。",
 		}
 	}

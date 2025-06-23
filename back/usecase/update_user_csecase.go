@@ -39,13 +39,11 @@ func (u *updateUserUsecase) Execute(
 		authService := service.NewAuthService()
 		if authService.IsAccountCodeDuplicate(*accountCode, &authUser.AccountCode, u.userRepository) {
 			return nil, &internal.UsecaseError{
-				Code:    400,
 				Message: "アカウントコードが重複しています",
 			}
 		}
 		if !authService.IsValidAccountCode(*accountCode) {
 			return nil, &internal.UsecaseError{
-				Code:    400,
 				Message: "アカウントコードの形式が正しくありません",
 			}
 		}
@@ -58,7 +56,6 @@ func (u *updateUserUsecase) Execute(
 		url, err := u.fileRepository.Upload(file, *contentType)
 		if err != nil {
 			return nil, &internal.UsecaseError{
-				Code:    400,
 				Message: "画像ファイルのアップロードに失敗しました",
 			}
 		}
@@ -68,7 +65,6 @@ func (u *updateUserUsecase) Execute(
 	updatedUserEntity, err := u.userRepository.Update(userEntity)
 	if err != nil {
 		return nil, &internal.UsecaseError{
-			Code:    400,
 			Message: "ユーザー情報の更新に失敗しました",
 		}
 	}

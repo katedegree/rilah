@@ -18,7 +18,6 @@ func (u *deleteGroupUsecase) Execute(groupID, userID uint32) (*entity.GroupEntit
 	group, err := u.groupRepository.Delete(groupID, userID)
 	if err != nil {
 		return nil, &internal.UsecaseError{
-			Code:    400,
 			Message: "グループの削除に失敗しました",
 		}
 	}

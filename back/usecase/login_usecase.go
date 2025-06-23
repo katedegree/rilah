@@ -28,13 +28,11 @@ func (u *loginUsecase) Execute(ue entity.UserEntity) (*loginUsecaseResponse, *in
 	if err != nil {
 		return nil, &internal.UsecaseError{
 			Message: "ログイン処理中に問題が発生しました。時間をおいて再試行してください。",
-			Code:    500,
 		}
 	}
 	if userEntity == nil {
 		return nil, &internal.UsecaseError{
 			Message: "メールアドレスまたはパスワードが正しくありません。",
-			Code:    400,
 		}
 	}
 
@@ -42,7 +40,6 @@ func (u *loginUsecase) Execute(ue entity.UserEntity) (*loginUsecaseResponse, *in
 	if err != nil {
 		return nil, &internal.UsecaseError{
 			Message: "メールアドレスまたはパスワードが正しくありません。",
-			Code:    400,
 		}
 	}
 
@@ -50,7 +47,6 @@ func (u *loginUsecase) Execute(ue entity.UserEntity) (*loginUsecaseResponse, *in
 	if err != nil {
 		return nil, &internal.UsecaseError{
 			Message: "ログイン処理中に問題が発生しました。時間をおいて再試行してください。",
-			Code:    500,
 		}
 	}
 

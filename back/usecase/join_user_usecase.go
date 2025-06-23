@@ -50,7 +50,6 @@ func (u *joinUserUsecase) Execute(groupID, userID, authID uint32) (*entity.Group
 
 	if err != nil {
 		return nil, &internal.UsecaseError{
-			Code:    400,
 			Message: "ユーザーの招待に失敗しました",
 		}
 	}

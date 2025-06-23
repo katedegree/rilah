@@ -28,14 +28,12 @@ func (u *signUpUsecase) Execute(ue entity.UserEntity) (*signUpUsecaseResponse, *
 
 	if authService.IsAccountCodeDuplicate(ue.AccountCode, nil, u.userRepository) {
 		return nil, &internal.UsecaseError{
-			Code:    400,
 			Message: "既に登録されているアカウントコードです。",
 		}
 	}
 
 	if !authService.IsValidAccountCode(ue.AccountCode) {
 		return nil, &internal.UsecaseError{
-			Code:    400,
 			Message: "アカウントコードはa-z, A-Z, 0-9, -, _のみ使用できます。",
 		}
 	}
@@ -43,7 +41,6 @@ func (u *signUpUsecase) Execute(ue entity.UserEntity) (*signUpUsecaseResponse, *
 	user, err := u.userRepository.Create(&ue)
 	if err != nil {
 		return nil, &internal.UsecaseError{
-			Code:    500,
 			Message: "ユーザー作成に失敗しました。",
 		}
 	}
@@ -51,7 +48,6 @@ func (u *signUpUsecase) Execute(ue entity.UserEntity) (*signUpUsecaseResponse, *
 	accessToken, err := u.accessTokenRepository.Create(user.ID)
 	if err != nil {
 		return nil, &internal.UsecaseError{
-			Code:    500,
 			Message: "ログインに失敗しました。再度ログインしてください。",
 		}
 	}

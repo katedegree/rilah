@@ -18,7 +18,6 @@ func (u *updateGroupUsecase) Execute(ge *entity.GroupEntity, userID uint32) (*en
 	group, err := u.groupRepository.Update(ge, userID)
 	if err != nil {
 		return nil, &internal.UsecaseError{
-			Code:    400,
 			Message: "グループの更新に失敗しました",
 		}
 	}
