@@ -13,8 +13,8 @@ import (
 	"context"
 )
 
-// DeleteUser is the resolver for the deleteUser field.
-func (r *mutationResolver) DeleteUser(ctx context.Context, groupID uint32) (*entity.MutationResponse, error) {
+// DeleteGroup is the resolver for the deleteGroup field.
+func (r *mutationResolver) DeleteGroup(ctx context.Context, groupID uint32) (*entity.MutationResponse, error) {
 	req := request.DeleteGroupRequest{
 		GroupID: groupID,
 	}

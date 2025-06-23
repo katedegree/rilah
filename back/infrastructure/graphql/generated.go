@@ -75,7 +75,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateGroup func(childComplexity int, name string) int
-		DeleteUser  func(childComplexity int, groupID uint32) int
+		DeleteGroup func(childComplexity int, groupID uint32) int
 		JoinUser    func(childComplexity int, groupID uint32, userID uint32) int
 		Login       func(childComplexity int, accountCode string, password string) int
 		SignUp      func(childComplexity int, name string, accountCode string, password string) int
@@ -116,7 +116,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	CreateGroup(ctx context.Context, name string) (*entity.MutationResponse, error)
-	DeleteUser(ctx context.Context, groupID uint32) (*entity.MutationResponse, error)
+	DeleteGroup(ctx context.Context, groupID uint32) (*entity.MutationResponse, error)
 	JoinUser(ctx context.Context, groupID uint32, userID uint32) (*entity.MutationResponse, error)
 	Login(ctx context.Context, accountCode string, password string) (*entity.AuthResponse, error)
 	SignUp(ctx context.Context, name string, accountCode string, password string) (*entity.AuthResponse, error)
@@ -264,17 +264,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.CreateGroup(childComplexity, args["name"].(string)), true
 
-	case "Mutation.deleteUser":
-		if e.complexity.Mutation.DeleteUser == nil {
+	case "Mutation.deleteGroup":
+		if e.complexity.Mutation.DeleteGroup == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_deleteUser_args(ctx, rawArgs)
+		args, err := ec.field_Mutation_deleteGroup_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteUser(childComplexity, args["groupId"].(uint32)), true
+		return e.complexity.Mutation.DeleteGroup(childComplexity, args["groupId"].(uint32)), true
 
 	case "Mutation.joinUser":
 		if e.complexity.Mutation.JoinUser == nil {
@@ -570,7 +570,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "schema/auth.graphql" "schema/auth_response.graphql" "schema/entity/access_token_entity.graphql" "schema/entity/group_entity.graphql" "schema/entity/point_entity.graphql" "schema/entity/user_entity.graphql" "schema/mutation/cretate_group_mutation.graphql" "schema/mutation/delete_user_mutation.graphql" "schema/mutation/join_user_mutaion.graphql" "schema/mutation/login_mutation.graphql" "schema/mutation/sign_up_mutation.graphql" "schema/mutation/update_group_mutation.graphql" "schema/mutation/update_user_mutation.graphql" "schema/mutation.graphql" "schema/mutation_response.graphql" "schema/query/group_users_query.graphql" "schema/query/groups_query.graphql" "schema/query.graphql" "schema/scalar/int32.graphql" "schema/scalar/time.graphql" "schema/scalar/uint32.graphql" "schema/scalar/upload.graphql"
+//go:embed "schema/auth.graphql" "schema/auth_response.graphql" "schema/entity/access_token_entity.graphql" "schema/entity/group_entity.graphql" "schema/entity/point_entity.graphql" "schema/entity/user_entity.graphql" "schema/mutation/cretate_group_mutation.graphql" "schema/mutation/delete_group_mutation.graphql" "schema/mutation/join_user_mutaion.graphql" "schema/mutation/login_mutation.graphql" "schema/mutation/sign_up_mutation.graphql" "schema/mutation/update_group_mutation.graphql" "schema/mutation/update_user_mutation.graphql" "schema/mutation.graphql" "schema/mutation_response.graphql" "schema/query/group_users_query.graphql" "schema/query/groups_query.graphql" "schema/query.graphql" "schema/scalar/int32.graphql" "schema/scalar/time.graphql" "schema/scalar/uint32.graphql" "schema/scalar/upload.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -589,7 +589,7 @@ var sources = []*ast.Source{
 	{Name: "schema/entity/point_entity.graphql", Input: sourceData("schema/entity/point_entity.graphql"), BuiltIn: false},
 	{Name: "schema/entity/user_entity.graphql", Input: sourceData("schema/entity/user_entity.graphql"), BuiltIn: false},
 	{Name: "schema/mutation/cretate_group_mutation.graphql", Input: sourceData("schema/mutation/cretate_group_mutation.graphql"), BuiltIn: false},
-	{Name: "schema/mutation/delete_user_mutation.graphql", Input: sourceData("schema/mutation/delete_user_mutation.graphql"), BuiltIn: false},
+	{Name: "schema/mutation/delete_group_mutation.graphql", Input: sourceData("schema/mutation/delete_group_mutation.graphql"), BuiltIn: false},
 	{Name: "schema/mutation/join_user_mutaion.graphql", Input: sourceData("schema/mutation/join_user_mutaion.graphql"), BuiltIn: false},
 	{Name: "schema/mutation/login_mutation.graphql", Input: sourceData("schema/mutation/login_mutation.graphql"), BuiltIn: false},
 	{Name: "schema/mutation/sign_up_mutation.graphql", Input: sourceData("schema/mutation/sign_up_mutation.graphql"), BuiltIn: false},
@@ -634,17 +634,17 @@ func (ec *executionContext) field_Mutation_createGroup_argsName(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_deleteUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_Mutation_deleteGroup_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := ec.field_Mutation_deleteUser_argsGroupID(ctx, rawArgs)
+	arg0, err := ec.field_Mutation_deleteGroup_argsGroupID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
 	args["groupId"] = arg0
 	return args, nil
 }
-func (ec *executionContext) field_Mutation_deleteUser_argsGroupID(
+func (ec *executionContext) field_Mutation_deleteGroup_argsGroupID(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (uint32, error) {
@@ -1805,8 +1805,8 @@ func (ec *executionContext) fieldContext_Mutation_createGroup(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_deleteUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteUser(ctx, field)
+func (ec *executionContext) _Mutation_deleteGroup(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteGroup(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1820,7 +1820,7 @@ func (ec *executionContext) _Mutation_deleteUser(ctx context.Context, field grap
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		directive0 := func(rctx context.Context) (any, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().DeleteUser(rctx, fc.Args["groupId"].(uint32))
+			return ec.resolvers.Mutation().DeleteGroup(rctx, fc.Args["groupId"].(uint32))
 		}
 
 		directive1 := func(ctx context.Context) (any, error) {
@@ -1858,7 +1858,7 @@ func (ec *executionContext) _Mutation_deleteUser(ctx context.Context, field grap
 	return ec.marshalNMutationResponse2ᚖbackᚋdomainᚋentityᚐMutationResponse(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_deleteUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_deleteGroup(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -1881,7 +1881,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteUser(ctx context.Context
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_deleteGroup_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -5430,9 +5430,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "deleteUser":
+		case "deleteGroup":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteUser(ctx, field)
+				return ec._Mutation_deleteGroup(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++

@@ -1,3 +1,0 @@
-extend type Mutation {
-    deleteUser(groupId: Uint32!): MutationResponse! @auth
-}

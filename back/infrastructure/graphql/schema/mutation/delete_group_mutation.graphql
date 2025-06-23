@@ -1,0 +1,3 @@
+extend type Mutation {
+    deleteGroup(groupId: Uint32!): MutationResponse! @auth
+}
