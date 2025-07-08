@@ -18,7 +18,7 @@ func main() {
 	orm := infrastructure.Gorm()
 
 	user := model.UserModel{
-		Name:        "中尾 渓斗",
+		Name:        "katedegree",
 		AccountCode: "katedegree",
 		Password:    string(hashedPassword),
 	}

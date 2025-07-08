@@ -30,13 +30,16 @@ func main() {
 		port = defaultPort
 	}
 
+	orm := infrastructure.Gorm()
+	storage := infrastructure.S3()
+	authDirective := directive.NewAuthDirective(orm)
 	srv := handler.New(graphql.NewExecutableSchema(graphql.Config{
 		Resolvers: &resolver.Resolver{
-			Orm:     infrastructure.Gorm(),
-			Storage: infrastructure.S3(),
+			Orm:     orm,
+			Storage: storage,
 		},
 		Directives: graphql.DirectiveRoot{
-			Auth: directive.AuthDirective,
+			Auth: authDirective.Execute,
 		},
 	}))
 
@@ -57,7 +60,6 @@ func main() {
 		ctx := context.WithValue(r.Context(), constant.HTTP_REQUEST_KEY, r)
 		srv.ServeHTTP(w, r.WithContext(ctx))
 	}))
-
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
