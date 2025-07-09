@@ -1,14 +1,12 @@
 package main
 
 import (
-	"back/domain/constant"
 	"back/domain/entity"
 	"back/infrastructure"
 	"back/infrastructure/graphql"
 	"back/infrastructure/graphql/directive"
 	"back/infrastructure/graphql/resolver"
 	"back/pkg"
-	"context"
 	"log"
 	"net/http"
 	"os"
@@ -34,18 +32,18 @@ func main() {
 	orm := infrastructure.NewGorm()
 	storage := infrastructure.NewS3()
 	validator := infrastructure.NewValidate()
-	authContext := infrastructure.NewContext[*entity.UserEntity]("authUser")
-	requestContext := infrastructure.NewContext[*http.Request]("httpRequest")
+	authUserContext := infrastructure.NewContext[*entity.UserEntity]("authUser")
+	httpRequestContext := infrastructure.NewContext[*http.Request]("httpRequest")
 
-	authDirective := directive.NewAuthDirective(orm)
+	authDirective := directive.NewAuthDirective(orm, authUserContext, httpRequestContext)
 
 	srv := handler.New(graphql.NewExecutableSchema(graphql.Config{
 		Resolvers: &resolver.Resolver{
-			Orm:            orm,
-			Storage:        storage,
-			Validator:      validator,
-			AuthContext:    authContext,
-			RequestContext: requestContext,
+			Orm:                orm,
+			Storage:            storage,
+			Validator:          validator,
+			AuthUserContext:    authUserContext,
+			HttpRequestContext: httpRequestContext,
 		},
 		Directives: graphql.DirectiveRoot{
 			Auth: authDirective.Execute,
@@ -66,7 +64,7 @@ func main() {
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), constant.HTTP_REQUEST_KEY, r)
+		ctx := httpRequestContext.Set(r.Context(), r)
 		srv.ServeHTTP(w, r.WithContext(ctx))
 	}))
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)

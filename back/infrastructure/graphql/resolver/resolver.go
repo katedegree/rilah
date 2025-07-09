@@ -10,9 +10,9 @@ import (
 )
 
 type Resolver struct {
-	Orm            *gorm.DB
-	Storage        *s3.Client
-	Validator      infrastructure.IValidate
-	AuthContext    infrastructure.IContext[*entity.UserEntity]
-	RequestContext infrastructure.IContext[*http.Request]
+	Orm                *gorm.DB
+	Storage            *s3.Client
+	Validator          infrastructure.IValidate
+	AuthUserContext    infrastructure.IContext[*entity.UserEntity]
+	HttpRequestContext infrastructure.IContext[*http.Request]
 }

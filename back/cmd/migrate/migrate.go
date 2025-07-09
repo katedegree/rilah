@@ -26,6 +26,8 @@ func main() {
 	dir := "infrastructure/database/migration"
 
 	command := os.Args[1]
+
+	orm := infrastructure.NewGorm()
 	switch command {
 	case "create":
 		if len(os.Args) != 3 {
@@ -52,15 +54,15 @@ func main() {
 		if len(os.Args) != 2 {
 			FatalLog()
 		}
-		infrastructure.Gorm().Exec("DROP SCHEMA public CASCADE;")
-		infrastructure.Gorm().Exec("CREATE SCHEMA public;")
+		orm.Exec("DROP SCHEMA public CASCADE;")
+		orm.Exec("CREATE SCHEMA public;")
 		log.Println("リセットが完了しました。")
 	case "refresh":
 		if len(os.Args) != 2 {
 			FatalLog()
 		}
-		infrastructure.Gorm().Exec("DROP SCHEMA public CASCADE;")
-		infrastructure.Gorm().Exec("CREATE SCHEMA public;")
+		orm.Exec("DROP SCHEMA public CASCADE;")
+		orm.Exec("CREATE SCHEMA public;")
 		cmd := exec.Command("migrate", "-path", dir, "-database", dsn, "-verbose", "up")
 		execCommand(cmd)
 		log.Println("リフレッシュが完了しました。")
