@@ -15,11 +15,8 @@ import (
 
 // JoinUser is the resolver for the joinUser field.
 func (r *mutationResolver) JoinUser(ctx context.Context, groupID uint32, userID uint32) (*entity.MutationResponse, error) {
-	req := request.JoinUserRequest{
-		GroupID: groupID,
-		UserID:  userID,
-	}
-	msgs, ok := req.Validate()
+	req := request.NewJoinUserRequest(groupID, userID)
+	msgs, ok := req.Validate(r.Validator)
 	if !ok {
 		return &entity.MutationResponse{
 			Success:  false,

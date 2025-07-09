@@ -2,13 +2,20 @@ package request
 
 import "back/infrastructure"
 
-type SignUpRequest struct {
+type signUpRequest struct {
 	Name        string `validate:"required|max=255"`
 	AccountCode string `validate:"required|max=255"`
 	Password    string `validate:"required|max=255"`
 }
 
-func (r *SignUpRequest) Validate() ([]string, bool) {
+func NewSignUpRequest(Name string, AccountCode string, Password string) Request {
+	return &signUpRequest{
+		Name:        Name,
+		AccountCode: AccountCode,
+		Password:    Password,
+	}
+}
+func (r *signUpRequest) Validate(v infrastructure.IValidate) ([]string, bool) {
 	rules := map[string]map[string]string{
 		"Name": {
 			"required": "名前を入力してください",
@@ -24,5 +31,5 @@ func (r *SignUpRequest) Validate() ([]string, bool) {
 		},
 	}
 
-	return infrastructure.Validate(r, rules)
+	return v.Execute(r, rules)
 }

@@ -14,11 +14,8 @@ import (
 
 // UpdateGroup is the resolver for the updateGroup field.
 func (r *mutationResolver) UpdateGroup(ctx context.Context, groupID uint32, name string) (*entity.MutationResponse, error) {
-	req := request.UpdateGroupRequest{
-		GroupID: groupID,
-		Name:    name,
-	}
-	msgs, ok := req.Validate()
+	req := request.NewUpdateGroupRequest(groupID, name)
+	msgs, ok := req.Validate(r.Validator)
 	if !ok {
 		return &entity.MutationResponse{
 			Success:  false,

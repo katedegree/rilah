@@ -14,11 +14,8 @@ import (
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, accountCode string, password string) (*entity.AuthResponse, error) {
-	req := request.LoginRequest{
-		AccountCode: accountCode,
-		Password:    password,
-	}
-	msgs, ok := req.Validate()
+	req := request.NewLoginRequest(accountCode, password)
+	msgs, ok := req.Validate(r.Validator)
 	if !ok {
 		return &entity.AuthResponse{
 			AccessToken: "",

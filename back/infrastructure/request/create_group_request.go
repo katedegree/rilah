@@ -2,11 +2,14 @@ package request
 
 import "back/infrastructure"
 
-type CreateGroupRequest struct {
+type createGroupRequest struct {
 	Name string `validate:"required|max=255"`
 }
 
-func (r *CreateGroupRequest) Validate() ([]string, bool) {
+func NewCreateGroupRequest(name string) Request {
+	return &createGroupRequest{Name: name}
+}
+func (r *createGroupRequest) Validate(v infrastructure.IValidate) ([]string, bool) {
 	rules := map[string]map[string]string{
 		"Name": {
 			"required": "グループ名を入力してください。",
@@ -14,5 +17,5 @@ func (r *CreateGroupRequest) Validate() ([]string, bool) {
 		},
 	}
 
-	return infrastructure.Validate(r, rules)
+	return v.Execute(r, rules)
 }

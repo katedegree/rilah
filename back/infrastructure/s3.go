@@ -10,7 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-func S3() *s3.Client {
+func NewS3() *s3.Client {
 	ctx := context.Background()
 
 	accessKey := os.Getenv("AWS_ACCESS_KEY_ID")

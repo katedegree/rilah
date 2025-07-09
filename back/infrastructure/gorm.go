@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Gorm() *gorm.DB {
+func NewGorm() *gorm.DB {
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_DATABASE")

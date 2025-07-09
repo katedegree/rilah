@@ -14,12 +14,8 @@ import (
 
 // SignUp is the resolver for the signUp field.
 func (r *mutationResolver) SignUp(ctx context.Context, name string, accountCode string, password string) (*entity.AuthResponse, error) {
-	req := request.SignUpRequest{
-		Name:        name,
-		AccountCode: accountCode,
-		Password:    password,
-	}
-	msgs, ok := req.Validate()
+	req := request.NewSignUpRequest(name, accountCode, password)
+	msgs, ok := req.Validate(r.Validator)
 	if !ok {
 		return &entity.AuthResponse{
 			AccessToken: "",

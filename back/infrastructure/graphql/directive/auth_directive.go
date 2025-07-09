@@ -13,7 +13,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type authDirective struct{
+type authDirective struct {
 	orm *gorm.DB
 }
 

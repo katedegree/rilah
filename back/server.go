@@ -2,6 +2,7 @@ package main
 
 import (
 	"back/domain/constant"
+	"back/domain/entity"
 	"back/infrastructure"
 	"back/infrastructure/graphql"
 	"back/infrastructure/graphql/directive"
@@ -30,13 +31,21 @@ func main() {
 		port = defaultPort
 	}
 
-	orm := infrastructure.Gorm()
-	storage := infrastructure.S3()
+	orm := infrastructure.NewGorm()
+	storage := infrastructure.NewS3()
+	validator := infrastructure.NewValidate()
+	authContext := infrastructure.NewContext[*entity.UserEntity]("authUser")
+	requestContext := infrastructure.NewContext[*http.Request]("httpRequest")
+
 	authDirective := directive.NewAuthDirective(orm)
+
 	srv := handler.New(graphql.NewExecutableSchema(graphql.Config{
 		Resolvers: &resolver.Resolver{
-			Orm:     orm,
-			Storage: storage,
+			Orm:            orm,
+			Storage:        storage,
+			Validator:      validator,
+			AuthContext:    authContext,
+			RequestContext: requestContext,
 		},
 		Directives: graphql.DirectiveRoot{
 			Auth: authDirective.Execute,

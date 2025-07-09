@@ -19,21 +19,15 @@ import (
 
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, name *string, accountCode *string, password *string, imageFile *graphql.Upload) (*entity.MutationResponse, error) {
-	req := request.UpdateUserRequest{}
-	if name != nil {
-		req.Name = *name
-	}
-	if accountCode != nil {
-		req.AccountCode = *accountCode
-	}
-	if password != nil {
-		req.Password = *password
-	}
+	var file io.ReadSeeker = nil
+	var contentType string = ""
 	if imageFile != nil {
-		req.File = imageFile.File
-		req.ContentType = imageFile.ContentType
+		file = imageFile.File
+		contentType = imageFile.ContentType
 	}
-	msgs, ok := req.Validate()
+
+	req := request.NewUpdateUserRequest(name, accountCode, password, file, contentType)
+	msgs, ok := req.Validate(r.Validator)
 	if !ok {
 		return &entity.MutationResponse{
 			Success:  false,
@@ -50,15 +44,13 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, name *string, account
 		repository.NewFileRepository(storage),
 	)
 
-	var file io.ReadSeeker
-	var contentType *string
 	if imageFile != nil {
 		buf := new(bytes.Buffer)
 		if _, err := io.Copy(buf, imageFile.File); err != nil {
 			return nil, err
 		}
 		file = bytes.NewReader(buf.Bytes())
-		contentType = &imageFile.ContentType
+		contentType = imageFile.ContentType
 	}
 
 	err := updateUserUsecase.Execute(
@@ -67,7 +59,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, name *string, account
 		accountCode,
 		password,
 		file,
-		contentType,
+		&contentType,
 	)
 	if err != nil {
 		return &entity.MutationResponse{

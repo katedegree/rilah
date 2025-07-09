@@ -4,7 +4,16 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func Validate(input any, rules map[string]map[string]string) ([]string, bool) {
+type IValidate interface {
+	Execute(input any, rules map[string]map[string]string) ([]string, bool)
+}
+type Validate struct{}
+
+func NewValidate() IValidate {
+	return &Validate{}
+}
+
+func (v *Validate) Execute(input any, rules map[string]map[string]string) ([]string, bool) {
 	var vld = validator.New()
 
 	err := vld.Struct(input)

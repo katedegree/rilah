@@ -2,12 +2,18 @@ package request
 
 import "back/infrastructure"
 
-type UpdateGroupRequest struct {
+type updateGroupRequest struct {
 	GroupID uint32 `validate:"required|gt=0"`
 	Name    string `validate:"required|max=255"`
 }
 
-func (r *UpdateGroupRequest) Validate() ([]string, bool) {
+func NewUpdateGroupRequest(GroupID uint32, Name string) Request {
+	return &updateGroupRequest{
+		GroupID: GroupID,
+		Name:    Name,
+	}
+}
+func (r *updateGroupRequest) Validate(v infrastructure.IValidate) ([]string, bool) {
 	rules := map[string]map[string]string{
 		"GroupID": {
 			"required": "グループIDを入力してください。",
@@ -19,5 +25,5 @@ func (r *UpdateGroupRequest) Validate() ([]string, bool) {
 		},
 	}
 
-	return infrastructure.Validate(r, rules)
+	return v.Execute(r, rules)
 }

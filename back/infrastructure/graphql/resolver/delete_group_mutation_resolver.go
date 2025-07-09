@@ -15,10 +15,8 @@ import (
 
 // DeleteGroup is the resolver for the deleteGroup field.
 func (r *mutationResolver) DeleteGroup(ctx context.Context, groupID uint32) (*entity.MutationResponse, error) {
-	req := request.DeleteGroupRequest{
-		GroupID: groupID,
-	}
-	msgs, ok := req.Validate()
+	req := request.NewDeleteGroupRequest(groupID)
+	msgs, ok := req.Validate(r.Validator)
 	if !ok {
 		return &entity.MutationResponse{
 			Success:  false,

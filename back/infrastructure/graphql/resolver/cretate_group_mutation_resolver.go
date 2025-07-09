@@ -15,10 +15,8 @@ import (
 
 // CreateGroup is the resolver for the createGroup field.
 func (r *mutationResolver) CreateGroup(ctx context.Context, name string) (*entity.MutationResponse, error) {
-	req := request.CreateGroupRequest{
-		Name: name,
-	}
-	msgs, ok := req.Validate()
+	req := request.NewCreateGroupRequest(name)
+	msgs, ok := req.Validate(r.Validator)
 	if !ok {
 		return &entity.MutationResponse{
 			Success:  false,

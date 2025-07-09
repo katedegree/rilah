@@ -15,7 +15,7 @@ func main() {
 		log.Fatalf("Error hashing password: %v", err)
 	}
 
-	orm := infrastructure.Gorm()
+	orm := infrastructure.NewGorm()
 
 	user := model.UserModel{
 		Name:        "katedegree",
