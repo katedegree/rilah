@@ -6,12 +6,12 @@ type IContext[T any] interface {
 	Get(ctx context.Context) T
 	Set(ctx context.Context, value T) context.Context
 }
-type ContextKey string
+type contextKey string
 type Context[T any] struct {
-	key ContextKey
+	key contextKey
 }
 
-func NewContext[T any](key ContextKey) IContext[T] {
+func NewContext[T any](key contextKey) IContext[T] {
 	return &Context[T]{key: key}
 }
 

@@ -7,13 +7,13 @@ import (
 type IValidate interface {
 	Execute(input any, rules map[string]map[string]string) ([]string, bool)
 }
-type Validate struct{}
+type validate struct{}
 
 func NewValidate() IValidate {
-	return &Validate{}
+	return &validate{}
 }
 
-func (v *Validate) Execute(input any, rules map[string]map[string]string) ([]string, bool) {
+func (v *validate) Execute(input any, rules map[string]map[string]string) ([]string, bool) {
 	var vld = validator.New()
 
 	err := vld.Struct(input)
